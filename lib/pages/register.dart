@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:get/get.dart';
 import 'package:otp_login/pages/login.dart';
-import 'package:otp_login/pages/verify.dart';
+import 'package:otp_login/controllers/register_controller.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
 
   @override
-  State<Register> createState() => _RegisterState();
+  _RegisterState createState() => _RegisterState();
 }
 
 class _RegisterState extends State<Register> {
+  late RegisterController registerController; // Declare the controller
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    registerController =
+        Get.put(RegisterController()); // Initialize the controller
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +33,12 @@ class _RegisterState extends State<Register> {
         child: SingleChildScrollView(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.05),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 70),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                   const Text(
                     'Welcome',
                     style: TextStyle(
@@ -35,27 +48,26 @@ class _RegisterState extends State<Register> {
                       color: Color(0XFF00712D),
                     ),
                   ),
-                  const SizedBox(
-                    height: 50,
-                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      '     Hello there, sigin to continue',
+                      'Hello there, sign up to continue',
                       style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: Color(0XFF00712D)),
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: Color(0XFF00712D),
+                      ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 17,
-                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  // Input field for Name
                   SizedBox(
-                    width: 350, // Lebar TextField
-                    height: 50, // Tinggi TextField
+                    width: MediaQuery.of(context).size.width * 0.9,
                     child: TextField(
+                      controller: TextEditingController(
+                          text: registerController.nama.value),
                       decoration: InputDecoration(
                         labelText: 'Name',
                         hintText: 'Input name',
@@ -67,13 +79,18 @@ class _RegisterState extends State<Register> {
                         prefixIcon: const Icon(Icons.person_outline),
                       ),
                       keyboardType: TextInputType.name,
+                      onChanged: (value) => registerController.nama.value =
+                          value, // Update the controller
                     ),
                   ),
-                  const SizedBox(height: 17),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  // Input field for Email
                   SizedBox(
-                    width: 350, // Lebar TextField
-                    height: 50, // Tinggi TextField
+                    width: MediaQuery.of(context).size.width * 0.9,
                     child: TextField(
+                      controller: TextEditingController(
+                          text: registerController.email.value),
                       decoration: InputDecoration(
                         labelText: 'Email',
                         hintText: 'Input email',
@@ -85,13 +102,18 @@ class _RegisterState extends State<Register> {
                         prefixIcon: const Icon(Icons.email_outlined),
                       ),
                       keyboardType: TextInputType.emailAddress,
+                      onChanged: (value) => registerController.email.value =
+                          value, // Update the controller
                     ),
                   ),
-                  const SizedBox(height: 17),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  // Input field for Phone
                   SizedBox(
-                    width: 350, // Lebar TextField
-                    height: 50, // Tinggi TextField
+                    width: MediaQuery.of(context).size.width * 0.9,
                     child: TextField(
+                      controller: TextEditingController(
+                          text: registerController.phone.value),
                       decoration: InputDecoration(
                         labelText: 'Phone',
                         hintText: 'Input phone',
@@ -102,14 +124,19 @@ class _RegisterState extends State<Register> {
                         ),
                         prefixIcon: const Icon(Icons.phone_outlined),
                       ),
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.phone,
+                      onChanged: (value) => registerController.phone.value =
+                          value, // Update the controller
                     ),
                   ),
-                  const SizedBox(height: 17),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  // Input field for Password
                   SizedBox(
-                    width: 350,
-                    height: 50,
+                    width: MediaQuery.of(context).size.width * 0.9,
                     child: TextField(
+                      controller: TextEditingController(
+                          text: registerController.pass.value),
                       obscureText: !_isPasswordVisible,
                       decoration: InputDecoration(
                         labelText: 'Password',
@@ -127,26 +154,27 @@ class _RegisterState extends State<Register> {
                                 : Icons.visibility_off_outlined,
                           ),
                           onPressed: () {
-                            setState(
-                              () {
-                                _isPasswordVisible =
-                                    !_isPasswordVisible; // Toggle visibilitas
-                              },
-                            );
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
                           },
                         ),
                       ),
+                      onChanged: (value) => registerController.pass.value =
+                          value, // Update the controller
                     ),
                   ),
-                  const SizedBox(height: 17),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  // Input field for Confirm Password
                   SizedBox(
-                    width: 350,
-                    height: 50,
+                    width: MediaQuery.of(context).size.width * 0.9,
                     child: TextField(
-                      obscureText: !_isPasswordVisible,
+                      controller: _confirmPasswordController,
+                      obscureText: !_isConfirmPasswordVisible,
                       decoration: InputDecoration(
-                        labelText: 'Password',
-                        hintText: 'Confrim password',
+                        labelText: 'Confirm Password',
+                        hintText: 'Re-enter password',
                         border: OutlineInputBorder(
                           borderSide: const BorderSide(
                               color: Color(0XFF00712D), width: 2),
@@ -155,33 +183,40 @@ class _RegisterState extends State<Register> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _isPasswordVisible
+                            _isConfirmPasswordVisible
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
                           ),
                           onPressed: () {
-                            setState(
-                              () {
-                                _isPasswordVisible =
-                                    !_isPasswordVisible; // Toggle visibilitas
-                              },
-                            );
+                            setState(() {
+                              _isConfirmPasswordVisible =
+                                  !_isConfirmPasswordVisible;
+                            });
                           },
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  // Register Button
                   SizedBox(
-                    height: 50,
-                    width: 350,
+                    height: MediaQuery.of(context).size.height * 0.07,
+                    width: MediaQuery.of(context).size.width * 0.9,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Verify(),
-                          ),
-                          (route) => false),
+                      onPressed: () {
+                        if (registerController.pass.value ==
+                            _confirmPasswordController.text) {
+                          // Call register method from the controller if passwords match
+                          registerController.register();
+                        } else {
+                          // Show error message if passwords do not match
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Passwords do not match')),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0XFF00712D),
                         foregroundColor: const Color(0XFFFFFBE6),
@@ -190,7 +225,7 @@ class _RegisterState extends State<Register> {
                         ),
                       ),
                       child: const Text(
-                        'Login',
+                        'Register',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 16,
@@ -199,7 +234,9 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+
+                  // "I have an account? Sign In"
                   RichText(
                     text: TextSpan(
                       style: const TextStyle(
@@ -224,12 +261,11 @@ class _RegisterState extends State<Register> {
                                 ),
                                 (route) => false,
                               );
-                              ("Sign In pressed");
                             },
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

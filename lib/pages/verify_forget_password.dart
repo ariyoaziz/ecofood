@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:otp_login/pages/home.dart';
+import 'package:otp_login/pages/reset_password.dart';
 import 'dart:async';
 
-class Verify extends StatefulWidget {
-  const Verify({super.key});
+class VerifyForgetPassword extends StatefulWidget {
+  const VerifyForgetPassword({super.key});
 
   @override
-  State<Verify> createState() => _VerifyState();
+  State<VerifyForgetPassword> createState() => _VerifyForgetPasswordState();
 }
 
-class _VerifyState extends State<Verify> {
+class _VerifyForgetPasswordState extends State<VerifyForgetPassword> {
   final TextEditingController controller1 = TextEditingController();
   final TextEditingController controller2 = TextEditingController();
   final TextEditingController controller3 = TextEditingController();
@@ -39,6 +39,10 @@ class _VerifyState extends State<Verify> {
   @override
   void dispose() {
     timer.cancel();
+    controller1.dispose();
+    controller2.dispose();
+    controller3.dispose();
+    controller4.dispose();
     super.dispose();
   }
 
@@ -59,7 +63,7 @@ class _VerifyState extends State<Verify> {
         child: SingleChildScrollView(
           child: Center(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              padding: EdgeInsets.all(screenWidth * 0.05),
               child: Column(
                 children: [
                   SizedBox(height: screenHeight * 0.1),
@@ -83,29 +87,30 @@ class _VerifyState extends State<Verify> {
                     'Verify with the code just now we have sent',
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: screenWidth * 0.03,
+                      fontSize: screenWidth * 0.035,
                       color: const Color(0xFF1C1C1C),
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: screenHeight * 0.04),
+                  SizedBox(height: screenHeight * 0.03),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _otpTextField(controller1),
-                      SizedBox(width: screenWidth * 0.02),
+                      const SizedBox(width: 8),
                       _otpTextField(controller2),
-                      SizedBox(width: screenWidth * 0.02),
+                      const SizedBox(width: 8),
                       _otpTextField(controller3),
-                      SizedBox(width: screenWidth * 0.02),
+                      const SizedBox(width: 8),
                       _otpTextField(controller4),
                     ],
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   Text(
-                    'Enter the code before  ${formatCountdown(countdownSeconds)}',
+                    'Enter the code before ${formatCountdown(countdownSeconds)}',
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: screenWidth * 0.03,
+                      fontSize: screenWidth * 0.035,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF1C1C1C),
                     ),
@@ -120,12 +125,11 @@ class _VerifyState extends State<Verify> {
                         startTimer();
                       }
                     },
-                    child: Text(
+                    child: const Text(
                       'Resend',
                       style: TextStyle(
-                        color: const Color(0XFF00712D),
+                        color: Color(0XFF00712D),
                         fontWeight: FontWeight.bold,
-                        fontSize: screenWidth * 0.04,
                         decoration: TextDecoration.underline,
                         fontFamily: 'Poppins',
                       ),
@@ -141,13 +145,21 @@ class _VerifyState extends State<Verify> {
                             controller2.text +
                             controller3.text +
                             controller4.text;
-                        ("OTP entered: $otp");
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MyHomePage(),
-                          ),
-                        );
+
+                        if (otp == "") {
+                          // dengan OTP yang sesuai
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ResetPassword(),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("OTP salah, coba lagi")),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0XFF00712D),
@@ -176,10 +188,8 @@ class _VerifyState extends State<Verify> {
   }
 
   Widget _otpTextField(TextEditingController controller) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return SizedBox(
-      width: screenWidth * 0.12,
+      width: 50,
       child: TextField(
         controller: controller,
         textAlign: TextAlign.center,

@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:otp_login/pages/home.dart';
+import 'package:get/get.dart';
+import 'package:otp_login/controllers/login_controller.dart';
+import 'package:otp_login/pages/forget_password.dart';
 import 'package:otp_login/pages/register.dart';
 
-class Login extends StatefulWidget {
+class Login extends StatelessWidget {
   const Login({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
-}
-
-class _LoginState extends State<Login> {
-  // Untuk mengontrol visibilitas password
-  bool _isPasswordVisible = false;
-
-  @override
   Widget build(BuildContext context) {
+    final LoginController loginController = Get.find<LoginController>();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color(0XFFFFFFFF),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -34,13 +32,11 @@ class _LoginState extends State<Login> {
                     color: Color(0XFF00712D),
                   ),
                 ),
-                const SizedBox(height: 50),
-
-                // Teks rata kiri
+                SizedBox(height: screenHeight * 0.05),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    '      Hello there, sigin to continue',
+                    'Hello there, sign in to continue',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 16,
@@ -49,14 +45,14 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
+                SizedBox(height: screenHeight * 0.02),
 
-                const SizedBox(height: 17),
-
-                // SizedBox untuk TextField Email atau Phone
+                // Input untuk Email atau Phone
                 SizedBox(
-                  width: 350, // Lebar TextField
-                  height: 50, // Tinggi TextField
+                  width: screenWidth * 0.9,
+                  height: screenHeight * 0.07,
                   child: TextField(
+                    controller: loginController.emailOrPhoneController,
                     decoration: InputDecoration(
                       labelText: 'Email or Phone',
                       hintText: 'Input email or phone',
@@ -70,49 +66,44 @@ class _LoginState extends State<Login> {
                     keyboardType: TextInputType.emailAddress,
                   ),
                 ),
-                const SizedBox(height: 17),
+                SizedBox(height: screenHeight * 0.02),
 
-                // SizedBox untuk TextField Password
-                SizedBox(
-                  width: 350,
-                  height: 50,
-                  child: TextField(
-                    obscureText: !_isPasswordVisible,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      hintText: 'Input your password',
-                      border: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            color: Color(0XFF00712D), width: 2),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(
-                            () {
-                              _isPasswordVisible =
-                                  !_isPasswordVisible; // Toggle visibilitas
+                // Input untuk Password
+                Obx(() => SizedBox(
+                      width: screenWidth * 0.9,
+                      height: screenHeight * 0.07,
+                      child: TextField(
+                        controller: loginController.passwordController,
+                        obscureText: !loginController.isPasswordVisible.value,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Input your password',
+                          border: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                                color: Color(0XFF00712D), width: 2),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              loginController.isPasswordVisible.value
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              loginController.isPasswordVisible.value =
+                                  !loginController.isPasswordVisible.value;
                             },
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
+                    )),
 
                 // Tautan "Forget Password"
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      // Aksi saat "Forget Password" ditekan
-                    },
+                    onPressed: () => Get.to(const ForgetPassword()),
                     child: const Text(
                       'Forget Password?',
                       style: TextStyle(
@@ -123,19 +114,14 @@ class _LoginState extends State<Login> {
                   ),
                 ),
 
-                const SizedBox(height: 50),
+                SizedBox(height: screenHeight * 0.05),
 
                 // Tombol Login
                 SizedBox(
-                  height: 50,
-                  width: 350,
+                  height: screenHeight * 0.07,
+                  width: screenWidth * 0.9,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MyHomePage(),
-                        ),
-                        (route) => false),
+                    onPressed: () => loginController.login(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0XFF00712D),
                       foregroundColor: const Color(0XFFFFFBE6),
@@ -153,17 +139,13 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-
-                // Teks "Don't have an account? Sign Up"
-                const SizedBox(height: 20),
+                SizedBox(height: screenHeight * 0.03),
 
                 // Teks "Don't have an account? Sign Up"
                 RichText(
                   text: TextSpan(
                     style: const TextStyle(
-                      color:
-                          Colors.black, // Warna untuk "Don't have an account?"
+                      color: Colors.black,
                       fontFamily: 'Poppins',
                     ),
                     children: [
@@ -171,25 +153,18 @@ class _LoginState extends State<Login> {
                       TextSpan(
                         text: 'Sign Up',
                         style: const TextStyle(
-                          color: Color(0XFF00712D), // Warna untuk "Sign Up"
+                          color: Color(0XFF00712D),
                           fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline, // Garis bawah
+                          decoration: TextDecoration.underline,
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Register(),
-                              ),
-                              (route) => false,
-                            );
-                            ("Sign Up pressed");
+                            Get.to(const Register());
                           },
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),

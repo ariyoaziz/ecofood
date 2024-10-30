@@ -52,13 +52,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Menggunakan MediaQuery untuk mendapatkan ukuran layar
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: Center(
-        child: Image.asset(
-          'assets/images/logo.png',
-          width: 200,
-          height: 200,
+        child: AnimatedOpacity(
+          opacity: visible ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 1000),
+          child: Image.asset(
+            'assets/images/logo.png',
+            width: screenWidth * 0.5, // Ukuran responsif sesuai lebar layar
+            height: screenHeight * 0.25, // Ukuran responsif sesuai tinggi layar
+          ),
         ),
       ),
     );

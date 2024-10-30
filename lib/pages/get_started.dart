@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:otp_login/pages/login.dart';
 import 'package:otp_login/pages/register.dart';
+import 'package:otp_login/bindings/login_binding.dart';
 
-class GetStarted extends StatefulWidget {
+class GetStarted extends StatelessWidget {
   const GetStarted({super.key});
 
   @override
-  State<GetStarted> createState() => _GetStartedState();
-}
-
-class _GetStartedState extends State<GetStarted> {
-  @override
   Widget build(BuildContext context) {
+    // Using MediaQuery to get screen size
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      backgroundColor: const Color(0XFFFFFfff),
+      backgroundColor: const Color(0XFFFFFFFF),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
                   'assets/images/get_started2.png',
-                  height: 300,
-                  width: 300,
+                  height: screenHeight * 0.3,
+                  width: screenWidth * 0.6,
                 ),
-                const SizedBox(height: 45),
+                SizedBox(height: screenHeight * 0.05),
 
-                // Teks 'Welcome'
+                // Welcome Text
                 const Text(
                   'Welcome',
                   style: TextStyle(
@@ -38,9 +39,8 @@ class _GetStartedState extends State<GetStarted> {
                     color: Color(0XFF00712D),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: screenHeight * 0.01),
 
-                // Teks 'Fuel Your Body with'
                 const Text(
                   'Fuel Your Body with',
                   style: TextStyle(
@@ -51,7 +51,7 @@ class _GetStartedState extends State<GetStarted> {
                 ),
                 const SizedBox(height: 5),
 
-                // Teks RichText 'ecofood'
+                // RichText for 'ecofood'
                 RichText(
                   text: const TextSpan(
                     children: [
@@ -76,19 +76,17 @@ class _GetStartedState extends State<GetStarted> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 45),
+                SizedBox(height: screenHeight * 0.05),
 
-                // Tombol 'Login'
+                // Login Button
                 SizedBox(
-                  height: 50,
-                  width: 300,
+                  height: screenHeight * 0.06,
+                  width: screenWidth * 0.8,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Login(),
-                        ),
-                        (route) => false),
+                    onPressed: () {
+                      // Ensure the LoginBinding is called when navigating
+                      Get.offAll(() => const Login(), binding: LoginBinding());
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0XFF00712D),
                       foregroundColor: const Color(0XFFFFFBE6),
@@ -106,19 +104,23 @@ class _GetStartedState extends State<GetStarted> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 17),
+                SizedBox(height: screenHeight * 0.02),
 
-                // Tombol 'Create an Account'
+                // Create an Account Button
                 SizedBox(
-                  height: 50,
-                  width: 300,
+                  height: screenHeight * 0.06,
+                  width: screenWidth * 0.8,
                   child: OutlinedButton(
-                    onPressed: () => Navigator.pushAndRemoveUntil(
+                    onPressed: () {
+                      // Navigate to Register page
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const Register(),
                         ),
-                        (route) => false),
+                        (route) => false,
+                      );
+                    },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(
                         color: Color(0XFF00712D),
