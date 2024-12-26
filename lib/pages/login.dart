@@ -3,7 +3,6 @@ import 'package:flutter/gestures.dart';
 import 'package:ecofood/pages/home.dart';
 import 'package:ecofood/pages/register.dart';
 import 'package:ecofood/pages/forget_password.dart';
-import 'package:get/get.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
