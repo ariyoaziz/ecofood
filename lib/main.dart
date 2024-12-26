@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:otp_login/pages/splash_screen.dart';
+import 'package:ecofood/pages/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());

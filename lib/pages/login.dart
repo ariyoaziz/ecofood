@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:otp_login/pages/home.dart';
-import 'package:otp_login/pages/register.dart';
+import 'package:ecofood/pages/home.dart';
+import 'package:ecofood/pages/register.dart';
+import 'package:ecofood/pages/forget_password.dart';
+import 'package:get/get.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -111,7 +113,14 @@ class _LoginState extends State<Login> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      // Aksi saat "Forget Password" ditekan
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgetPassword(),
+                        ),
+                        (route) => false,
+                      );
+                      print("Sign Up pressed");
                     },
                     child: const Text(
                       'Forget Password?',

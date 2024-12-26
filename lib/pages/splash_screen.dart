@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:otp_login/pages/get_started.dart';
+import 'package:ecofood/pages/get_started.dart';
 import 'dart:async'; // Import untuk Future.delayed
 
 class SplashScreen extends StatefulWidget {

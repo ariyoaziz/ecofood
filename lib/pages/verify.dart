@@ -1,5 +1,6 @@
+import 'package:ecofood/pages/reset_password.dart';
 import 'package:flutter/material.dart';
-import 'package:otp_login/pages/home.dart';
+import 'package:ecofood/pages/home.dart';
 import 'dart:async';
 
 class Verify extends StatefulWidget {
@@ -15,7 +16,7 @@ class _VerifyState extends State<Verify> {
   final TextEditingController controller3 = TextEditingController();
   final TextEditingController controller4 = TextEditingController();
 
-  int countdownSeconds = 30; // Durasi countdown dalam detik
+  int countdownSeconds = 30;
   late Timer timer;
 
   @override
@@ -38,7 +39,7 @@ class _VerifyState extends State<Verify> {
 
   @override
   void dispose() {
-    timer.cancel(); // Menghentikan timer saat widget dibuang
+    timer.cancel();
     super.dispose();
   }
 
@@ -50,114 +51,124 @@ class _VerifyState extends State<Verify> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color(0XFFFFFFFF),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(children: [
-                const SizedBox(height: 100),
-                Image.asset(
-                  'assets/images/verify.png',
-                ),
-                const SizedBox(height: 50),
-                const Text(
-                  'Verify Your Phone Number',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1C1C1C),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              child: Column(
+                children: [
+                  SizedBox(height: screenHeight * 0.1),
+                  Image.asset(
+                    'assets/images/verify.png',
+                    width: screenWidth * 0.5,
+                    height: screenWidth * 0.5,
                   ),
-                ),
-                const SizedBox(height: 17),
-                const Text(
-                  'Verify with the code just now we have sent',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.normal,
-                    color: Color(0xFF1C1C1C),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _otpTextField(controller1),
-                    const SizedBox(width: 8),
-                    _otpTextField(controller2),
-                    const SizedBox(width: 8),
-                    _otpTextField(controller3),
-                    const SizedBox(width: 8),
-                    _otpTextField(controller4),
-                  ],
-                ),
-                const SizedBox(height: 17),
-                Text(
-                  'enter the code before  ${formatCountdown(countdownSeconds)}',
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1C1C1C),
-                  ),
-                ),
-                const SizedBox(height: 17),
-                GestureDetector(
-                  onTap: () {
-                    // Aksi saat "Resend" di-tap
-                    if (countdownSeconds == 0) {
-                      // Reset countdown dan mulai lagi
-                      setState(() {
-                        countdownSeconds = 30;
-                      });
-                      startTimer();
-                    }
-                  },
-                  child: const Text(
-                    'Resend',
+                  SizedBox(height: screenHeight * 0.05),
+                  Text(
+                    'Verify Your Phone Number',
                     style: TextStyle(
-                      color: Color(0XFF00712D),
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline,
                       fontFamily: 'Poppins',
+                      fontSize: screenWidth * 0.05,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1C1C1C),
                     ),
                   ),
-                ),
-                const SizedBox(height: 50),
-                SizedBox(
-                  height: 50,
-                  width: 350,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      String otp = controller1.text +
-                          controller2.text +
-                          controller3.text +
-                          controller4.text;
-                      ("OTP entered: $otp");
-                      // Navigasi ke halaman home setelah mengklik Confirm
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const MyHomePage(), // Ganti dengan nama halaman home
-                        ),
-                      );
+                  SizedBox(height: screenHeight * 0.02),
+                  Text(
+                    'Verify with the code just now we have sent',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: screenWidth * 0.03,
+                      color: const Color(0xFF1C1C1C),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.04),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _otpTextField(controller1),
+                      SizedBox(width: screenWidth * 0.02),
+                      _otpTextField(controller2),
+                      SizedBox(width: screenWidth * 0.02),
+                      _otpTextField(controller3),
+                      SizedBox(width: screenWidth * 0.02),
+                      _otpTextField(controller4),
+                    ],
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  Text(
+                    'Enter the code before  ${formatCountdown(countdownSeconds)}',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: screenWidth * 0.03,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1C1C1C),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  GestureDetector(
+                    onTap: () {
+                      if (countdownSeconds == 0) {
+                        setState(() {
+                          countdownSeconds = 30;
+                        });
+                        startTimer();
+                      }
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0XFF00712D),
-                      foregroundColor: const Color(0XFFFFFBE6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                    child: Text(
+                      'Resend',
+                      style: TextStyle(
+                        color: const Color(0XFF00712D),
+                        fontWeight: FontWeight.bold,
+                        fontSize: screenWidth * 0.04,
+                        decoration: TextDecoration.underline,
+                        fontFamily: 'Poppins',
                       ),
                     ),
-                    child: const Text('Confirm'),
                   ),
-                ),
-              ]),
+                  SizedBox(height: screenHeight * 0.05),
+                  SizedBox(
+                    height: screenHeight * 0.07,
+                    width: screenWidth * 0.9,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        String otp = controller1.text +
+                            controller2.text +
+                            controller3.text +
+                            controller4.text;
+                        ("OTP entered: $otp");
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ResetPassword(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0XFF00712D),
+                        foregroundColor: const Color(0XFFFFFBE6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        'Confirm',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -166,19 +177,20 @@ class _VerifyState extends State<Verify> {
   }
 
   Widget _otpTextField(TextEditingController controller) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SizedBox(
-      width: 50, // Lebar input
+      width: screenWidth * 0.12,
       child: TextField(
         controller: controller,
         textAlign: TextAlign.center,
         keyboardType: TextInputType.number,
-        maxLength: 1, // Hanya 1 karakter
+        maxLength: 1,
         decoration: const InputDecoration(
           counterText: '',
           border: OutlineInputBorder(),
         ),
         onChanged: (value) {
-          // Pindah fokus ke TextField berikutnya
           if (value.length == 1) {
             FocusScope.of(context).nextFocus();
           }

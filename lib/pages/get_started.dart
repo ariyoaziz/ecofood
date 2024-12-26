@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:otp_login/pages/login.dart';
-import 'package:otp_login/pages/register.dart';
+import 'package:ecofood/pages/login.dart';
+import 'package:ecofood/pages/register.dart';
 
 class GetStarted extends StatefulWidget {
   const GetStarted({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:otp_login/pages/login.dart';
-import 'package:otp_login/pages/verify.dart';
+import 'package:ecofood/pages/login.dart';
+import 'package:ecofood/pages/verify.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
