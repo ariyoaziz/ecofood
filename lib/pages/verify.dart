@@ -1,6 +1,5 @@
 import 'package:ecofood/pages/reset_password.dart';
 import 'package:flutter/material.dart';
-import 'package:ecofood/pages/home.dart';
 import 'dart:async';
 
 class Verify extends StatefulWidget {

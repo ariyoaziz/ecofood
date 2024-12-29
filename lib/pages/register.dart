@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
-import 'package:ecofood/pages/login.dart';
+import 'package:ecofood/controllers/auth_controller.dart';
 import 'package:ecofood/pages/verify.dart';
 
 class Register extends StatefulWidget {
@@ -11,7 +10,14 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final AuthController _authController = AuthController();
   bool _isPasswordVisible = false;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +41,11 @@ class _RegisterState extends State<Register> {
                       color: Color(0XFF00712D),
                     ),
                   ),
-                  const SizedBox(
-                    height: 50,
-                  ),
+                  const SizedBox(height: 50),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      '     Hello there, sigin to continue',
+                      '     Hello there, sign in to continue',
                       style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 16,
@@ -49,139 +53,68 @@ class _RegisterState extends State<Register> {
                           color: Color(0XFF00712D)),
                     ),
                   ),
-                  const SizedBox(
-                    height: 17,
-                  ),
-                  SizedBox(
-                    width: 350, // Lebar TextField
-                    height: 50, // Tinggi TextField
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Name',
-                        hintText: 'Input name',
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Color(0XFF00712D), width: 2),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        prefixIcon: const Icon(Icons.person_outline),
-                      ),
-                      keyboardType: TextInputType.name,
-                    ),
+                  const SizedBox(height: 17),
+                  _buildTextField(
+                    controller: _nameController,
+                    labelText: 'Name',
+                    hintText: 'Input name',
+                    icon: Icons.person_outline,
                   ),
                   const SizedBox(height: 17),
-                  SizedBox(
-                    width: 350, // Lebar TextField
-                    height: 50, // Tinggi TextField
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        hintText: 'Input email',
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Color(0XFF00712D), width: 2),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        prefixIcon: const Icon(Icons.email_outlined),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
+                  _buildTextField(
+                    controller: _emailController,
+                    labelText: 'Email',
+                    hintText: 'Input email',
+                    icon: Icons.email_outlined,
                   ),
                   const SizedBox(height: 17),
-                  SizedBox(
-                    width: 350, // Lebar TextField
-                    height: 50, // Tinggi TextField
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: 'Phone',
-                        hintText: 'Input phone',
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Color(0XFF00712D), width: 2),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        prefixIcon: const Icon(Icons.phone_outlined),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
+                  _buildTextField(
+                    controller: _phoneController,
+                    labelText: 'Phone',
+                    hintText: 'Input phone',
+                    icon: Icons.phone_outlined,
                   ),
                   const SizedBox(height: 17),
-                  SizedBox(
-                    width: 350,
-                    height: 50,
-                    child: TextField(
-                      obscureText: !_isPasswordVisible,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        hintText: 'Input password',
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Color(0XFF00712D), width: 2),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                          ),
-                          onPressed: () {
-                            setState(
-                              () {
-                                _isPasswordVisible =
-                                    !_isPasswordVisible; // Toggle visibilitas
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                  _buildTextField(
+                    controller: _passwordController,
+                    labelText: 'Password',
+                    hintText: 'Input password',
+                    icon: Icons.lock_outline,
+                    obscureText: !_isPasswordVisible,
+                    toggleVisibility: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                    isPassword: true,
                   ),
                   const SizedBox(height: 17),
-                  SizedBox(
-                    width: 350,
-                    height: 50,
-                    child: TextField(
-                      obscureText: !_isPasswordVisible,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        hintText: 'Confrim password',
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Color(0XFF00712D), width: 2),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                          ),
-                          onPressed: () {
-                            setState(
-                              () {
-                                _isPasswordVisible =
-                                    !_isPasswordVisible; // Toggle visibilitas
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                  _buildTextField(
+                    controller: _confirmPasswordController,
+                    labelText: 'Confirm Password',
+                    hintText: 'Re-enter password',
+                    icon: Icons.lock_outline,
+                    obscureText: !_isPasswordVisible,
+                    toggleVisibility: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                    isPassword: true,
                   ),
                   const SizedBox(height: 50),
                   SizedBox(
                     height: 50,
                     width: 350,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Verify(),
-                          ),
-                          (route) => false),
+                      onPressed: () => _authController.registerUser(
+                        context,
+                        name: _nameController.text,
+                        email: _emailController.text,
+                        phone: _phoneController.text,
+                        password: _passwordController.text,
+                        confirmPassword: _confirmPasswordController.text,
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0XFF00712D),
                         foregroundColor: const Color(0XFFFFFBE6),
@@ -190,7 +123,7 @@ class _RegisterState extends State<Register> {
                         ),
                       ),
                       child: const Text(
-                        'Login',
+                        'Register',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 16,
@@ -199,41 +132,47 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'Poppins',
-                      ),
-                      children: [
-                        const TextSpan(text: "I have an account? "),
-                        TextSpan(
-                          text: 'Sign In',
-                          style: const TextStyle(
-                            color: Color(0XFF00712D),
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Login(),
-                                ),
-                                (route) => false,
-                              );
-                              ("Sign In pressed");
-                            },
-                        ),
-                      ],
-                    ),
-                  )
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required String hintText,
+    required IconData icon,
+    bool obscureText = false,
+    VoidCallback? toggleVisibility,
+    bool isPassword = false,
+  }) {
+    return SizedBox(
+      width: 350,
+      height: 50,
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          labelText: labelText,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          prefixIcon: Icon(icon),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    obscureText
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                  ),
+                  onPressed: toggleVisibility,
+                )
+              : null,
         ),
       ),
     );

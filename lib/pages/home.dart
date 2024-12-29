@@ -344,7 +344,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             child: Image.asset(
               item['image'],
-              height: 120,
+              height: 130,
               width: double.infinity,
               fit: BoxFit.cover,
             ),

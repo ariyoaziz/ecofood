@@ -119,7 +119,7 @@ class _LoginState extends State<Login> {
                         ),
                         (route) => false,
                       );
-                      print("Sign Up pressed");
+                      ("Sign Up pressed");
                     },
                     child: const Text(
                       'Forget Password?',
