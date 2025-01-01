@@ -48,14 +48,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: screenHeight * 0.25,
+            expandedHeight: MediaQuery.of(context).size.height * 0.25,
             flexibleSpace: FlexibleSpaceBar(
               background: ClipRRect(
                 borderRadius: const BorderRadius.only(
@@ -72,16 +69,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(
-                        left: screenWidth * 0.05,
-                        top: screenHeight * 0.1,
-                        right: screenWidth * 0.05,
+                        left: MediaQuery.of(context).size.width * 0.05,
+                        top: MediaQuery.of(context).size.height * 0.1,
+                        right: MediaQuery.of(context).size.width * 0.05,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildUserGreeting(),
-                          SizedBox(height: screenHeight * 0.05),
-                          _buildSearchField(screenWidth),
+                          SizedBox(
+                              height:
+                                  MediaQuery.of(context).size.height * 0.05),
+                          _buildSearchField(),
                         ],
                       ),
                     ),
@@ -92,14 +91,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.all(screenWidth * 0.05),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
               child: Column(
                 children: [
                   _buildImageCarousel(),
-                  SizedBox(height: screenHeight * 0.02),
-                  _buildPromotionButton(screenWidth),
-                  SizedBox(height: screenHeight * 0.03),
-                  _buildFoodGrid(screenWidth),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  _buildPromotionButton(),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  _buildFoodGrid(),
                 ],
               ),
             ),
@@ -111,6 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
+              // ignore: deprecated_member_use
               color: Colors.black.withOpacity(0.1),
               blurRadius: 8,
               offset: const Offset(0, -2),
@@ -163,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Color(0XFF1C1C1C),
               ),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 3),
             Text(
               "Good Morning",
               style: TextStyle(
@@ -193,11 +193,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildSearchField(double screenWidth) {
+  Widget _buildSearchField() {
     return Center(
       child: SizedBox(
-        width: screenWidth * 0.9,
-        height: 40,
+        width:
+            MediaQuery.of(context).size.width * 0.85, // Lebar lebih fleksibel
+        height: MediaQuery.of(context).size.height *
+            0.05, // Menyesuaikan tinggi berdasarkan tinggi layar
         child: TextField(
           decoration: InputDecoration(
             filled: true,
@@ -208,8 +210,12 @@ class _MyHomePageState extends State<MyHomePage> {
               borderRadius: BorderRadius.circular(30),
               borderSide: BorderSide.none,
             ),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            contentPadding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height *
+                  0.01, // Padding lebih responsif
+              horizontal: MediaQuery.of(context).size.width *
+                  0.03, // Padding horizontal dinamis
+            ),
           ),
         ),
       ),
@@ -268,10 +274,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildPromotionButton(double screenWidth) {
+  Widget _buildPromotionButton() {
     return SizedBox(
       height: 40,
-      width: screenWidth * 0.9,
+      width: MediaQuery.of(context).size.width * 0.9,
       child: ElevatedButton(
         onPressed: () {},
         style: ElevatedButton.styleFrom(
@@ -307,9 +313,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildFoodGrid(double screenWidth) {
+  Widget _buildFoodGrid() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+      padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.04),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),

@@ -3,42 +3,23 @@ import 'package:ecofood/services/api_service.dart';
 import 'package:get/get.dart';
 import 'package:ecofood/controllers/auth_controller.dart'; // Import AuthController
 
-class Verify extends StatefulWidget {
+class VerifyResetPw extends StatefulWidget {
   final String phone;
 
-  const Verify({super.key, required this.phone});
+  const VerifyResetPw({super.key, required this.phone});
 
   @override
-  State<Verify> createState() => _VerifyState();
+  State<VerifyResetPw> createState() => _VerifyResetPwState();
 }
 
-class _VerifyState extends State<Verify> {
+class _VerifyResetPwState extends State<VerifyResetPw> {
   final TextEditingController controller1 = TextEditingController();
   final TextEditingController controller2 = TextEditingController();
   final TextEditingController controller3 = TextEditingController();
   final TextEditingController controller4 = TextEditingController();
 
-  // Instance AuthController
-  final AuthController authController = AuthController(
-      apiService: ApiService()); // Assuming ApiService is correctly initialized
-
-  // Fungsi untuk memverifikasi OTP
-  Future<void> verifyOtp(String otp) async {
-    try {
-      if (widget.phone.isEmpty) {
-        Get.snackbar('Error', 'Phone number is empty!');
-        return;
-      }
-
-      await authController.verifyOtpForRegistration(
-        otp: otp,
-        phone: widget.phone,
-        context: context,
-      );
-    } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan: $e');
-    }
-  }
+  // Mengambil instance AuthController yang sudah ada
+  final AuthController authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -110,20 +91,50 @@ class _VerifyState extends State<Verify> {
                     width: screenWidth * 0.9,
                     child: ElevatedButton(
                       onPressed: () async {
+                        // Menggabungkan nilai controller untuk OTP
                         String otp = controller1.text +
                             controller2.text +
                             controller3.text +
                             controller4.text;
 
-                        if (otp.length == 4) {
-                          // Memanggil metode verifyOtpForRegistration dari authController
-                          await verifyOtp(otp);
-                        } else {
+                        // Validasi jika OTP terdiri dari 4 digit
+                        if (otp.length != 4 ||
+                            otp.contains(RegExp(r'[^0-9]'))) {
                           Get.snackbar(
-                            'Error',
-                            'Masukkan OTP yang valid',
-                            snackPosition: SnackPosition.BOTTOM,
+                            "Error",
+                            "Kode OTP harus terdiri dari 4 digit angka.",
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
                           );
+                          return; // Hentikan jika OTP tidak valid
+                        }
+
+                        // Menampilkan dialog loading
+                        showDialog(
+                          context: context,
+                          barrierDismissible:
+                              false, // Mencegah dismiss saat loading
+                          builder: (context) =>
+                              const Center(child: CircularProgressIndicator()),
+                        );
+
+                        try {
+                          // Panggil fungsi konfirmasi OTP
+                          await authController.confirmOtpForPasswordReset(
+                            otp: otp,
+                            context: context,
+                          );
+                        } catch (e) {
+                          // Jika ada error, tampilkan error message
+                          Get.snackbar(
+                            "Error",
+                            "Terjadi kesalahan saat memverifikasi OTP: $e",
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                          );
+                        } finally {
+                          // Menutup dialog loading setelah proses selesai
+                          Navigator.pop(context);
                         }
                       },
                       style: ElevatedButton.styleFrom(

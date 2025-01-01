@@ -2,11 +2,12 @@ import 'package:get/get.dart';
 import 'package:ecofood/controllers/auth_controller.dart';
 import 'package:ecofood/services/api_service.dart';
 
-class RegisterBinding extends Bindings {
+class ForgetPasswordBinding extends Bindings {
   @override
   void dependencies() {
-    // Menyuntikkan ApiService ke dalam AuthController
+    // Menyuntikkan ApiService dan AuthController untuk ForgetPassword
     Get.lazyPut<ApiService>(() => ApiService());
-    Get.lazyPut<AuthController>(() => AuthController(apiService: Get.find()));
+    Get.lazyPut<AuthController>(
+        () => AuthController(apiService: Get.find<ApiService>()));
   }
 }

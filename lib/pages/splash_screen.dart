@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ecofood/pages/get_started.dart';
+
+import 'package:get/get.dart';
 import 'dart:async'; // Import untuk Future.delayed
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,31 +25,26 @@ class _SplashScreenState extends State<SplashScreen> {
       });
     });
 
-    // Menunggu 3 detik sebelum pindah ke halaman Get Started
-    Timer(
-      const Duration(seconds: 3),
-      () {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const GetStarted(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = 0.0;
-              const end = 1.0;
-              const curve = Curves.easeInOut;
+    // Panggil fungsi _navigate untuk memeriksa apakah aplikasi pertama kali diluncurkan
+    _navigate();
+  }
 
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-              return FadeTransition(
-                opacity: animation.drive(tween),
-                child: child,
-              );
-            },
-          ),
-        );
-      },
-    );
+  // Fungsi untuk menunggu dan memeriksa apakah aplikasi pertama kali diluncurkan
+  Future<void> _navigate() async {
+    await Future.delayed(const Duration(seconds: 3)); // Tunggu selama 3 detik
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+
+    if (isFirstLaunch) {
+      // Jika pertama kali, arahkan ke halaman 'get_started'
+      await prefs.setBool('isFirstLaunch',
+          false); // Setel 'isFirstLaunch' menjadi false setelah peluncuran pertama
+      Get.offNamed('/get_started');
+    } else {
+      // Jika sudah login sebelumnya, arahkan ke halaman 'login'
+      Get.offNamed('/login');
+    }
   }
 
   @override
@@ -55,10 +52,14 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: Center(
-        child: Image.asset(
-          'assets/images/logo.png',
-          width: 200,
-          height: 200,
+        child: AnimatedOpacity(
+          opacity: visible ? 1.0 : 0.0, // Fade-in animasi
+          duration: const Duration(milliseconds: 1500),
+          child: Image.asset(
+            'assets/images/logo.png', // Gantilah dengan path logo Anda
+            width: 200,
+            height: 200,
+          ),
         ),
       ),
     );

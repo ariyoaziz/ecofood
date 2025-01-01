@@ -1,6 +1,10 @@
+import 'package:ecofood/pages/verify.dart';
 import 'package:flutter/material.dart';
 import 'package:ecofood/controllers/auth_controller.dart';
-import 'package:ecofood/pages/verify.dart';
+import 'package:ecofood/services/api_service.dart';
+import 'package:flutter/gestures.dart';
+import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -10,7 +14,8 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final AuthController _authController = AuthController();
+  final AuthController _authController =
+      AuthController(apiService: ApiService());
   bool _isPasswordVisible = false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -18,6 +23,9 @@ class _RegisterState extends State<Register> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  var logger = Logger();
+
+  String? _errorMessage; // Untuk simpan pesan error
 
   @override
   Widget build(BuildContext context) {
@@ -28,111 +36,167 @@ class _RegisterState extends State<Register> {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 70),
-                  const Text(
-                    'Welcome',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 31,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0XFF00712D),
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '     Hello there, sign in to continue',
-                      style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: Color(0XFF00712D)),
-                    ),
-                  ),
-                  const SizedBox(height: 17),
-                  _buildTextField(
-                    controller: _nameController,
-                    labelText: 'Name',
-                    hintText: 'Input name',
-                    icon: Icons.person_outline,
-                  ),
-                  const SizedBox(height: 17),
-                  _buildTextField(
-                    controller: _emailController,
-                    labelText: 'Email',
-                    hintText: 'Input email',
-                    icon: Icons.email_outlined,
-                  ),
-                  const SizedBox(height: 17),
-                  _buildTextField(
-                    controller: _phoneController,
-                    labelText: 'Phone',
-                    hintText: 'Input phone',
-                    icon: Icons.phone_outlined,
-                  ),
-                  const SizedBox(height: 17),
-                  _buildTextField(
-                    controller: _passwordController,
-                    labelText: 'Password',
-                    hintText: 'Input password',
-                    icon: Icons.lock_outline,
-                    obscureText: !_isPasswordVisible,
-                    toggleVisibility: () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
-                    isPassword: true,
-                  ),
-                  const SizedBox(height: 17),
-                  _buildTextField(
-                    controller: _confirmPasswordController,
-                    labelText: 'Confirm Password',
-                    hintText: 'Re-enter password',
-                    icon: Icons.lock_outline,
-                    obscureText: !_isPasswordVisible,
-                    toggleVisibility: () {
-                      setState(() {
-                        _isPasswordVisible = !_isPasswordVisible;
-                      });
-                    },
-                    isPassword: true,
-                  ),
-                  const SizedBox(height: 50),
-                  SizedBox(
-                    height: 50,
-                    width: 350,
-                    child: ElevatedButton(
-                      onPressed: () => _authController.registerUser(
-                        context,
-                        name: _nameController.text,
-                        email: _emailController.text,
-                        phone: _phoneController.text,
-                        password: _passwordController.text,
-                        confirmPassword: _confirmPasswordController.text,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0XFF00712D),
-                        foregroundColor: const Color(0XFFFFFBE6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Text(
-                        'Register',
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double lebarLayar = constraints.maxWidth;
+                  double lebarForm = lebarLayar * 0.9; // 90% dari lebar layar
+
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Selamat Datang',
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 16,
+                          fontSize: 31,
                           fontWeight: FontWeight.bold,
+                          color: Color(0XFF00712D),
                         ),
                       ),
-                    ),
-                  ),
-                ],
+                      const SizedBox(height: 50),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Hai, daftar dulu yuk biar bisa lanjut',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                            color: Color(0XFF00712D),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 17),
+                      _buildTextField(
+                        controller: _nameController,
+                        labelText: 'Nama',
+                        hintText: 'Masukkan nama kamu',
+                        icon: Icons.person_outline,
+                        width: lebarForm,
+                      ),
+                      const SizedBox(height: 17),
+                      _buildTextField(
+                        controller: _emailController,
+                        labelText: 'Email',
+                        hintText: 'Masukkan email kamu',
+                        icon: Icons.email_outlined,
+                        width: lebarForm,
+                      ),
+                      const SizedBox(height: 17),
+                      _buildTextField(
+                        controller: _phoneController,
+                        labelText: 'Nomor HP',
+                        hintText: 'Masukkan nomor HP kamu',
+                        icon: Icons.phone_outlined,
+                        width: lebarForm,
+                      ),
+                      const SizedBox(height: 17),
+                      _buildTextField(
+                        controller: _passwordController,
+                        labelText: 'Kata Sandi',
+                        hintText: 'Masukkan kata sandi kamu',
+                        icon: Icons.lock_outline,
+                        obscureText: !_isPasswordVisible,
+                        toggleVisibility: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                        isPassword: true,
+                        width: lebarForm,
+                      ),
+                      const SizedBox(height: 17),
+                      _buildTextField(
+                        controller: _confirmPasswordController,
+                        labelText: 'Konfirmasi Kata Sandi',
+                        hintText: 'Masukkan ulang kata sandi kamu',
+                        icon: Icons.lock_outline,
+                        obscureText: !_isPasswordVisible,
+                        toggleVisibility: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                        isPassword: true,
+                        width: lebarForm,
+                      ),
+                      const SizedBox(height: 50),
+                      // Tampilkan pesan error di bawah form kalau ada
+                      if (_errorMessage != null)
+                        Text(
+                          _errorMessage!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      SizedBox(
+                        height: 50,
+                        width: lebarForm,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            String nama = _nameController.text;
+                            String email = _emailController.text;
+                            String nomorHp = _phoneController.text;
+                            String kataSandi = _passwordController.text;
+                            String konfirmasiSandi =
+                                _confirmPasswordController.text;
+
+                            await _authController.register(
+                              name: nama,
+                              email: email,
+                              phone: nomorHp,
+                              password: kataSandi,
+                              confirmPassword: konfirmasiSandi,
+                              context: context,
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0XFF00712D),
+                            foregroundColor: const Color(0XFFFFFBE6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: const Text(
+                            'Daftar',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Poppins',
+                          ),
+                          children: [
+                            const TextSpan(text: "Sudah punya akun? "),
+                            TextSpan(
+                              text: 'Login',
+                              style: const TextStyle(
+                                color: Color(0XFF00712D),
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.toNamed('/login');
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -149,9 +213,10 @@ class _RegisterState extends State<Register> {
     bool obscureText = false,
     VoidCallback? toggleVisibility,
     bool isPassword = false,
+    required double width,
   }) {
     return SizedBox(
-      width: 350,
+      width: width,
       height: 50,
       child: TextField(
         controller: controller,

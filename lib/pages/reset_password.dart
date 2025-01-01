@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ecofood/pages/login.dart';
+import 'package:get/get.dart';
+import 'package:ecofood/controllers/auth_controller.dart'; // Import AuthController
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ResetPassword extends StatefulWidget {
   const ResetPassword({super.key});
@@ -9,7 +11,13 @@ class ResetPassword extends StatefulWidget {
 }
 
 class _ResetPasswordState extends State<ResetPassword> {
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _isPasswordVisible = false;
+
+  final AuthController authController =
+      Get.find<AuthController>(); // Mengakses AuthController
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +41,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   ),
                   SizedBox(height: screenHeight * 0.05),
                   Text(
-                    'Forgot Your Password?',
+                    'Lupa Kata Sandi?',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: screenWidth * 0.045,
@@ -43,7 +51,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   Text(
-                    "Don't worry! Just enter your phone below, and we'll send you a link to reset your password.",
+                    "Jangan khawatir! Cukup masukkan kata sandi baru Anda di bawah, dan kami akan memperbaruinya untuk Anda.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Poppins',
@@ -53,14 +61,16 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.05),
+                  // New Password Field
                   SizedBox(
                     width: screenWidth * 0.9,
                     height: screenHeight * 0.07,
                     child: TextField(
+                      controller: _newPasswordController,
                       obscureText: !_isPasswordVisible,
                       decoration: InputDecoration(
-                        labelText: 'Password',
-                        hintText: 'Enter your new password',
+                        labelText: 'Kata Sandi',
+                        hintText: 'Masukkan kata sandi baru Anda',
                         border: OutlineInputBorder(
                           borderSide: const BorderSide(
                             color: Color(0XFF00712D),
@@ -85,14 +95,16 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.02),
+                  // Confirm Password Field
                   SizedBox(
                     width: screenWidth * 0.9,
                     height: screenHeight * 0.07,
                     child: TextField(
+                      controller: _confirmPasswordController,
                       obscureText: !_isPasswordVisible,
                       decoration: InputDecoration(
-                        labelText: 'Confirm Password',
-                        hintText: 'Confirm your new password',
+                        labelText: 'Konfirmasi Kata Sandi',
+                        hintText: 'Konfirmasi kata sandi baru Anda',
                         border: OutlineInputBorder(
                           borderSide: const BorderSide(
                             color: Color(0XFF00712D),
@@ -117,17 +129,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.05),
+                  // Reset Password Button
                   SizedBox(
                     height: screenHeight * 0.07,
                     width: screenWidth * 0.9,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Login(),
-                        ),
-                        (route) => false,
-                      ),
+                      onPressed: _resetPassword,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0XFF00712D),
                         foregroundColor: const Color(0XFFFFFBE6),
@@ -136,7 +143,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         ),
                       ),
                       child: Text(
-                        'Reset Password',
+                        'Atur Ulang Kata Sandi',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: screenWidth * 0.04,
@@ -151,6 +158,41 @@ class _ResetPasswordState extends State<ResetPassword> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _resetPassword() async {
+    final newPassword = _newPasswordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (newPassword.isEmpty || confirmPassword.isEmpty) {
+      _showSnackbar('Kesalahan', 'Kata sandi tidak boleh kosong!');
+      return;
+    }
+
+    if (newPassword != confirmPassword) {
+      _showSnackbar('Kesalahan', 'Kata sandi tidak cocok!');
+      return;
+    }
+
+    // Panggil fungsi reset password di authController
+    try {
+      await authController.resetPassword(
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
+        context: context,
+      );
+    } catch (e) {
+      _showSnackbar('Kesalahan', 'Terjadi kesalahan: $e');
+    }
+  }
+
+  void _showSnackbar(String title, String message) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
     );
   }
 }

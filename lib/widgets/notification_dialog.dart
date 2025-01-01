@@ -27,6 +27,7 @@ class NotificationDialog {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
+                      // ignore: deprecated_member_use
                       color: Colors.black.withOpacity(0.2),
                       blurRadius: 10,
                       spreadRadius: 5,
