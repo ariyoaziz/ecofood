@@ -1,7 +1,7 @@
 import 'package:ecofood/pages/verify.dart';
 import 'package:flutter/material.dart';
-import 'package:ecofood/controllers/auth_controller.dart';
-import 'package:ecofood/services/api_service.dart';
+import 'package:ecofood/controllers/auth_regist.dart'; // Ganti dengan RegisterController
+import 'package:ecofood/services/register_service.dart'; // Pastikan ini yang digunakan
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -14,8 +14,8 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final AuthController _authController =
-      AuthController(apiService: ApiService());
+  final RegisterController _registerController = RegisterController(
+      apireg: ApiServicereg()); // Ganti ke RegisterController
   bool _isPasswordVisible = false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -25,7 +25,7 @@ class _RegisterState extends State<Register> {
       TextEditingController();
   var logger = Logger();
 
-  String? _errorMessage; // Untuk simpan pesan error
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class _RegisterState extends State<Register> {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   double lebarLayar = constraints.maxWidth;
-                  double lebarForm = lebarLayar * 0.9; // 90% dari lebar layar
+                  double lebarForm = lebarLayar * 0.9;
 
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -121,7 +121,6 @@ class _RegisterState extends State<Register> {
                         width: lebarForm,
                       ),
                       const SizedBox(height: 50),
-                      // Tampilkan pesan error di bawah form kalau ada
                       if (_errorMessage != null)
                         Text(
                           _errorMessage!,
@@ -144,7 +143,7 @@ class _RegisterState extends State<Register> {
                             String konfirmasiSandi =
                                 _confirmPasswordController.text;
 
-                            await _authController.register(
+                            await _registerController.register(
                               name: nama,
                               email: email,
                               phone: nomorHp,

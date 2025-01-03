@@ -1,5 +1,6 @@
 import 'package:ecofood/bindings/ForgetPasswordBinding.dart';
 import 'package:ecofood/bindings/registrasi_binding.dart';
+import 'package:ecofood/pages/Profile.dart';
 import 'package:ecofood/pages/forget_password.dart';
 import 'package:ecofood/pages/reset_password.dart';
 import 'package:ecofood/pages/verify_reset_pw.dart'; // Import halaman verify reset password
@@ -13,6 +14,8 @@ import 'package:ecofood/pages/register.dart'; // Halaman Registrasi
 import 'package:ecofood/pages/verify.dart'; // Halaman Verifikasi OTP
 import 'package:ecofood/pages/home.dart';
 import 'package:ecofood/bindings/login_binding.dart'; // Import login binding
+import 'package:ecofood/services/api_service.dart'; // Import ApiService
+import 'package:ecofood/controllers/auth_controller.dart'; // Import AuthController
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +29,11 @@ void main() async {
     await prefs.setBool('isFirstLaunch', false);
   }
 
-  // Jalankan aplikasi dengan nilai isFirstLaunch
+  // Inisialisasi service dan controller
+  final apiService = ApiService();
+  Get.put(apiService);
+  Get.put(AuthController(apiService: apiService));
+
   runApp(MyApp(isFirstLaunch: isFirstLaunch));
 }
 
@@ -39,7 +46,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/splash', // Mulai dengan Splash Screen terlebih dahulu
+      initialRoute: '/splash', // Navigasi awal
       getPages: [
         GetPage(
           name: '/splash',
@@ -64,24 +71,29 @@ class MyApp extends StatelessWidget {
           page: () => const Verify(phone: ''), // Halaman verifikasi OTP
         ),
         GetPage(
-          name: '/forget-password', // Menambahkan route untuk ForgetPassword
+          name: '/forget-password',
           page: () => const ForgetPassword(),
           binding: ForgetPasswordBinding(), // Binding untuk ForgetPassword
         ),
         GetPage(
-          name: '/verify-reset', // Halaman verifikasi reset password
-          page: () => const VerifyResetPw(phone: ''),
+          name: '/verify-reset',
+          page: () => const VerifyResetPw(
+              phone: ''), // Halaman verifikasi reset password
           binding: ForgetPasswordBinding(),
         ),
         GetPage(
-          name: '/reset-password', // Halaman reset password
-          page: () => const ResetPassword(),
+          name: '/reset-password',
+          page: () => const ResetPassword(), // Halaman reset password
           binding: ForgetPasswordBinding(),
         ),
         GetPage(
           name: '/home',
           page: () => const MyHomePage(),
         ), // Halaman utama
+        GetPage(
+          name: '/profile',
+          page: () => Profile(), // Halaman profile
+        ),
       ],
     );
   }

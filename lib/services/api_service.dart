@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -16,8 +17,8 @@ class ApiService {
     };
 
     try {
-      ('POST Request: $url');
-      ('Request Body: ${jsonEncode(data)}');
+      debugPrint('POST Request: $url');
+      debugPrint('Request Body: ${jsonEncode(data)}');
 
       final response = await http.post(
         url,
@@ -25,8 +26,8 @@ class ApiService {
         body: jsonEncode(data),
       );
 
-      ('Response Code: ${response.statusCode}');
-      ('Response Body: ${response.body}');
+      debugPrint('Response Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
       // Menghandle response dan error
       return _handleResponse(response);
@@ -42,14 +43,103 @@ class ApiService {
     }
   }
 
+  // Mengirim request GET
+  Future<Map<String, dynamic>> getRequest(String endpoint,
+      {String? token}) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+    final headers = {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+
+    try {
+      final response = await http.get(url, headers: headers);
+
+      return _handleResponse(response);
+    } on SocketException {
+      return {'error': 'No internet connection'};
+    } on FormatException {
+      return {'error': 'Invalid response format from server'};
+    } catch (e) {
+      return {'error': 'An unexpected error occurred: $e'};
+    }
+  }
+
+  // Menangani request PUT
+  Future<Map<String, dynamic>> putRequest(
+      String endpoint, Map<String, dynamic> data,
+      {String? token}) async {
+    final url = Uri.parse('$baseUrl$endpoint');
+    final headers = {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+
+    try {
+      final response = await http.put(
+        url,
+        headers: headers,
+        body: jsonEncode(data),
+      );
+
+      return _handleResponse(response);
+    } on SocketException {
+      return {'error': 'No internet connection'};
+    } on FormatException {
+      return {'error': 'Invalid response format from server'};
+    } catch (e) {
+      return {'error': 'An unexpected error occurred: $e'};
+    }
+  }
+
+  // // Menangani OTP
+  // static Future<Map<String, dynamic>> verifyOtp(
+  //     String phone, String otp) async {
+  //   final url = Uri.parse('http://your-api-url/verify-otp');
+  //   final data = {'phone': phone, 'otp': otp};
+
+  //   try {
+  //     final response = await http.post(url,
+  //         body: jsonEncode(data),
+  //         headers: {'Content-Type': 'application/json'});
+
+  //     return _handleResponse(response);
+  //   } on SocketException {
+  //     return {'error': 'No internet connection'};
+  //   } on FormatException {
+  //     return {'error': 'Invalid response format from server'};
+  //   } catch (e) {
+  //     return {'error': 'An unexpected error occurred: $e'};
+  //   }
+  // }
+
+  // // Mengirim OTP
+  // static Future<Map<String, dynamic>> sendOtp(String phone) async {
+  //   final url = Uri.parse('http://your-api-url/send-otp');
+  //   final data = {'phone': phone};
+
+  //   try {
+  //     final response = await http.post(url,
+  //         body: jsonEncode(data),
+  //         headers: {'Content-Type': 'application/json'});
+
+  //     return _handleResponse(response);
+  //   } on SocketException {
+  //     return {'error': 'No internet connection'};
+  //   } on FormatException {
+  //     return {'error': 'Invalid response format from server'};
+  //   } catch (e) {
+  //     return {'error': 'An unexpected error occurred: $e'};
+  //   }
+  // }
+
   // Menangani response dari server
-  Map<String, dynamic> _handleResponse(http.Response response) {
+  static Map<String, dynamic> _handleResponse(http.Response response) {
     // Jika status code 200 atau 201, berhasil
     if (response.statusCode == 200 || response.statusCode == 201) {
       try {
         return jsonDecode(response.body);
       } catch (e) {
-        // Jika gagal parse JSON
         return {'error': 'Failed to parse server response: $e'};
       }
     } else {
@@ -60,13 +150,10 @@ class ApiService {
             responseBody['message'] ?? 'An unexpected error occurred';
         return {'error': errorMessage};
       } catch (e) {
-        // Jika gagal parse response error
         return {'error': 'Failed to parse error response: $e'};
       }
     }
   }
 
-  static verifyOtp(String phone, String otp) {}
-
-  static void sendOtp(String phone) {}
+  // postRequestregist(String s, Map<String, String> data) {}
 }

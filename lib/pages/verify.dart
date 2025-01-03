@@ -1,7 +1,8 @@
+import 'package:ecofood/services/register_service.dart';
 import 'package:flutter/material.dart';
 import 'package:ecofood/services/api_service.dart';
 import 'package:get/get.dart';
-import 'package:ecofood/controllers/auth_controller.dart'; // Import AuthController
+import 'package:ecofood/controllers/auth_regist.dart'; // Import AuthController
 
 class Verify extends StatefulWidget {
   final String phone;
@@ -19,8 +20,8 @@ class _VerifyState extends State<Verify> {
   final TextEditingController controller4 = TextEditingController();
 
   // Instance AuthController
-  final AuthController authController = AuthController(
-      apiService: ApiService()); // Assuming ApiService is correctly initialized
+  final RegisterController apireg = RegisterController(
+      apireg: ApiServicereg()); // Assuming ApiService is correctly initialized
 
   // Fungsi untuk memverifikasi OTP
   Future<void> verifyOtp(String otp) async {
@@ -30,7 +31,7 @@ class _VerifyState extends State<Verify> {
         return;
       }
 
-      await authController.verifyOtpForRegistration(
+      await apireg.verifyOtpForRegistration(
         otp: otp,
         phone: widget.phone,
         context: context,

@@ -1,4 +1,11 @@
+// ignore_for_file: deprecated_member_use, prefer_const_constructors, duplicate_ignore
+
+import 'package:ecofood/controllers/midtrans_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:ecofood/services/api_service.dart';
+import 'package:ecofood/controllers/profile_controller.dart'; // Pastikan path ini benar
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -10,29 +17,68 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  String _userName = 'Loading...';
 
+  // Instance ProfileController
+  late final ProfileController _profileController;
+
+  // List item makanan
   final List<Map<String, dynamic>> _foodItems = [
     {
       "name": "Veggie Burgers",
       "price": "Rp30.000",
       "image": "assets/images/bener2.jpg",
+      "rating": 4.5,
     },
     {
       "name": "French Toast",
       "price": "Rp30.000",
       "image": "assets/images/bener2.jpg",
+      "rating": 4.2,
     },
     {
       "name": "Salad",
       "price": "Rp25.000",
       "image": "assets/images/bener2.jpg",
+      "rating": 4.7,
     },
     {
       "name": "Sandwich",
       "price": "Rp28.000",
       "image": "assets/images/bener2.jpg",
+      "rating": 4.3,
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize ProfileController
+    _profileController = ProfileController(apiService: ApiService());
+
+    // Get user profile when the page loads
+    _getUserProfile();
+  }
+
+  // Fungsi untuk mendapatkan profil pengguna
+  Future<void> _getUserProfile() async {
+    try {
+      // Memanggil ProfileController untuk mendapatkan data profil
+      String name = await _profileController.getProfilehome(context: context);
+
+      // Memperbarui UI dengan nama pengguna
+      setState(() {
+        _userName = name; // Update nama pengguna
+      });
+    } catch (e) {
+      setState(() {
+        _userName = 'Failed to load profile'; // Menangani kesalahan
+      });
+
+      // Optional: Menampilkan log atau snackbar untuk kesalahan
+      debugPrint('Error loading user profile: $e');
+    }
+  }
 
   void _onPageChanged(int index) {
     setState(() {
@@ -48,11 +94,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.height * 0.25,
+            expandedHeight: height * 0.25,
             flexibleSpace: FlexibleSpaceBar(
               background: ClipRRect(
                 borderRadius: const BorderRadius.only(
@@ -69,17 +118,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width * 0.05,
-                        top: MediaQuery.of(context).size.height * 0.1,
-                        right: MediaQuery.of(context).size.width * 0.05,
+                        left: width * 0.05,
+                        top: height * 0.1,
+                        right: width * 0.05,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildUserGreeting(),
-                          SizedBox(
-                              height:
-                                  MediaQuery.of(context).size.height * 0.05),
+                          SizedBox(height: height * 0.05),
                           _buildSearchField(),
                         ],
                       ),
@@ -91,13 +138,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+              padding: EdgeInsets.all(width * 0.05),
               child: Column(
                 children: [
                   _buildImageCarousel(),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  SizedBox(height: height * 0.02),
                   _buildPromotionButton(),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  SizedBox(height: height * 0.03),
                   _buildFoodGrid(),
                 ],
               ),
@@ -110,7 +157,6 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              // ignore: deprecated_member_use
               color: Colors.black.withOpacity(0.1),
               blurRadius: 8,
               offset: const Offset(0, -2),
@@ -147,15 +193,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // Menampilkan salam pengguna dengan nama yang diambil dari API
   Widget _buildUserGreeting() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Hi, Ariyo Aziz",
+              "Hi, $_userName", // Menampilkan nama pengguna
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,
@@ -165,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             SizedBox(height: 3),
             Text(
-              "Good Morning",
+              "Selamat siang",
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 16,
@@ -174,18 +221,23 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.black38,
-              width: 2,
-            ),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/profile.png'),
-              fit: BoxFit.cover,
+        GestureDetector(
+          onTap: () {
+            Get.toNamed('/profile'); // Navigasi ke halaman profil
+          },
+          child: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.black38,
+                width: 2,
+              ),
+              image: const DecorationImage(
+                image: AssetImage('assets/images/profile.png'),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
@@ -193,6 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // Field pencarian
   Widget _buildSearchField() {
     return Center(
       child: SizedBox(
@@ -222,6 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // Carousel gambar
   Widget _buildImageCarousel() {
     return Column(
       children: [
@@ -244,9 +298,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // Menampilkan gambar carousel
   Widget _buildCarouselImage(String imagePath) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(15),
+        topRight: Radius.circular(15),
+      ),
       child: Image.asset(
         imagePath,
         fit: BoxFit.cover,
@@ -254,6 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // Indikator halaman carousel
   Widget _buildPageIndicator() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -274,6 +333,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // Tombol promo
   Widget _buildPromotionButton() {
     return SizedBox(
       height: 40,
@@ -296,16 +356,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Get up to IDR 12K off per transaction.',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(right: 10.0),
-              child: Icon(
-                Icons.arrow_circle_right_rounded,
-                color: Color(0XFFFFFBE6),
-              ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.white,
             ),
           ],
         ),
@@ -313,75 +371,123 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // Grid item makanan
   Widget _buildFoodGrid() {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.04),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 2 / 3,
-        ),
-        itemCount: _foodItems.length,
-        itemBuilder: (context, index) {
-          final item = _foodItems[index];
-          return _buildFoodCard(item);
-        },
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
+      itemCount: _foodItems.length,
+      itemBuilder: (context, index) {
+        return _buildFoodItem(_foodItems[index]);
+      },
     );
   }
 
-  Widget _buildFoodCard(Map<String, dynamic> item) {
+  // Menambahkan tombol bayar pada setiap item makanan di GridView
+  Widget _buildFoodItem(Map<String, dynamic> foodItem) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      elevation: 2,
+      elevation: 5,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
-            child: Image.asset(
-              item['image'],
-              height: 130,
-              width: double.infinity,
-              fit: BoxFit.cover,
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
+              ),
+              child: Image.asset(
+                foodItem['image'],
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['name'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+            child: Text(
+              foodItem['name'],
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              foodItem['price'],
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.star,
+                color: Colors.yellow,
+                size: 20,
+              ),
+              Text(
+                foodItem['rating'].toString(),
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
                 ),
-                const SizedBox(height: 5),
-                const Text(
-                  "⭐ 4.7 • 100+ rating",
-                  style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+          // Tombol Bayar untuk melakukan transaksi
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                // Inisialisasi API Midtrans dengan harga item makanan yang dipilih
+                double totalPrice = double.parse(
+                    foodItem['price'].replaceAll('Rp', '').replaceAll('.', ''));
+                String userName =
+                    _userName; // Menggunakan nama pengguna yang sudah diambil
+                String userEmail =
+                    "email@example.com"; // Gantilah dengan email pengguna yang sebenarnya
+                String userPhone =
+                    "081234567890"; // Gantilah dengan nomor telepon pengguna yang sebenarnya
+
+                // Menggunakan MidtransController untuk membuat transaksi
+                MidtransController midtransController = MidtransController();
+                try {
+                  // Mengambil Snap Token dari Midtrans
+                  String token = await midtransController.createTransaction(
+                    totalPrice,
+                    userName,
+                    userEmail,
+                    userPhone,
+                  );
+
+                  // Navigasi ke halaman pembayaran atau menampilkan Snap Token untuk proses pembayaran lebih lanjut
+                  Get.toNamed('/payment', arguments: {'token': token});
+                } catch (e) {
+                  print('Terjadi kesalahan saat melakukan transaksi: $e');
+                }
+              },
+              child: const Text('Bayar Sekarang'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green, // Warna tombol bayar
+                foregroundColor: Colors.white, // Warna teks tombol
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  item['price'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ],

@@ -7,6 +7,7 @@ import 'package:ecofood/pages/login.dart';
 import 'package:ecofood/controllers/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/gestures.dart';
+// ignore: unnecessary_import
 import 'package:get/get_core/src/get_main.dart'; // Import halaman Verifikasi OTP
 
 class ForgetPassword extends StatefulWidget {

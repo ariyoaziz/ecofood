@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-class ApiService {
+class ApiServicereg {
   static const String baseUrl = 'http://10.0.2.2:5000';
 
   // Mengirim request POST
@@ -16,8 +16,8 @@ class ApiService {
     };
 
     try {
-      ('POST Request: $url');
-      ('Request Body: ${jsonEncode(data)}');
+      print('POST Request: $url');
+      print('Request Body: ${jsonEncode(data)}');
 
       final response = await http.post(
         url,
@@ -25,8 +25,8 @@ class ApiService {
         body: jsonEncode(data),
       );
 
-      ('Response Code: ${response.statusCode}');
-      ('Response Body: ${response.body}');
+      print('Response Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       // Menghandle response dan error
       return _handleResponse(response);
@@ -66,7 +66,21 @@ class ApiService {
     }
   }
 
-  static verifyOtp(String phone, String otp) {}
+  // Mengirim OTP ke nomor telepon
+  static Future<Map<String, dynamic>> sendOtp(String phone) async {
+    final endpoint =
+        '/auth/request-password-reset'; // Sesuaikan endpoint di server
+    final data = {'phone': phone};
 
-  static void sendOtp(String phone) {}
+    return await ApiServicereg().postRequest(endpoint, data);
+  }
+
+  // Memverifikasi OTP yang dikirimkan
+  static Future<Map<String, dynamic>> verifyOtp(
+      String phone, String otp) async {
+    final endpoint = '/otp/verify'; // Sesuaikan endpoint di server
+    final data = {'phone': phone, 'otp': otp};
+
+    return await ApiServicereg().postRequest(endpoint, data);
+  }
 }

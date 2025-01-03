@@ -38,6 +38,9 @@ dependencies:
   get: ^4.6.6
   shared_preferences: ^2.3.4
   logger: ^2.5.0
+  # midtrans_sdk: ^0.4.0
+  flutter_bloc: ^8.1.6
+  webview_flutter: ^4.10.0
 
 dev_dependencies:
   flutter_test:

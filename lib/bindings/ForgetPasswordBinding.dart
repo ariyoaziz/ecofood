@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:get/get.dart';
 import 'package:ecofood/controllers/auth_controller.dart';
 import 'package:ecofood/services/api_service.dart';

@@ -2,12 +2,11 @@
 
 import 'package:ecofood/pages/reset_password.dart';
 import 'package:ecofood/pages/verify.dart';
-import 'package:ecofood/pages/verify_reset_pw.dart';
 import 'package:flutter/material.dart';
 import 'package:ecofood/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
-import 'dart:io'; // Import GetX package untuk snackbar
+import 'dart:io';
 
 class AuthController {
   final ApiService apiService;
@@ -17,212 +16,41 @@ class AuthController {
 
   bool? get isVerified => null;
 
-// Fungsi registrasi
-  Future<void> register({
-    required String name,
-    required String email,
-    required String phone,
-    required String password,
-    required String confirmPassword,
-    required BuildContext context,
-  }) async {
-    // Validasi input
-    if (name.isEmpty ||
-        email.isEmpty ||
-        phone.isEmpty ||
-        password.isEmpty ||
-        confirmPassword.isEmpty) {
-      _showSnackbar(
-        context: context,
-        title: 'Kesalahan',
-        message: 'Semua kolom harus diisi!',
-        backgroundColor: Colors.red,
-      );
-      return;
+// Metode untuk menangani error login
+  void _handleLoginError(Map<String, dynamic> result, BuildContext context) {
+    String errorMessage;
+
+    switch (result['error']) {
+      case 'Invalid credentials':
+        errorMessage = 'Email/No HP atau password Anda salah. Coba lagi!';
+        break;
+      case 'User not found':
+        errorMessage =
+            'Akun dengan email/No HP ini tidak ditemukan. Daftar terlebih dahulu!';
+        break;
+      case 'Account not verified':
+        errorMessage =
+            'Akun Anda belum diverifikasi. Silakan cek email atau WhatsApp untuk kode verifikasi.';
+        break;
+      default:
+        errorMessage = 'Terjadi kesalahan: ${result['error']}';
     }
 
-    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(email)) {
-      _showSnackbar(
-        context: context,
-        title: 'Kesalahan',
-        message: 'Format email tidak valid!',
-        backgroundColor: Colors.red,
-      );
-      return;
-    }
-
-    if (!RegExp(r'^[1-9]\d{9,14}$').hasMatch(phone)) {
-      _showSnackbar(
-        context: context,
-        title: 'Kesalahan',
-        message:
-            'Nomor HP tidak valid! Nomor HP harus diawali dengan kode negara tanpa simbol "+".',
-        backgroundColor: Colors.red,
-      );
-      return;
-    }
-
-    if (password.length < 6) {
-      _showSnackbar(
-        context: context,
-        title: 'Kesalahan',
-        message: 'Kata sandi harus minimal 6 karakter!',
-        backgroundColor: Colors.red,
-      );
-      return;
-    }
-
-    if (password != confirmPassword) {
-      _showSnackbar(
-        context: context,
-        title: 'Kesalahan',
-        message: 'Kata sandi tidak cocok!',
-        backgroundColor: Colors.red,
-      );
-      return;
-    }
-
-    final data = {
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'password': password,
-      'confirm_password': confirmPassword,
-    };
-
-    try {
-      // Kirim data ke API
-      final result = await apiService.postRequest('/auth/register', data);
-
-      // ignore: unnecessary_null_comparison
-      if (result == null) {
-        _showSnackbar(
-          context: context,
-          title: 'Kesalahan',
-          message: 'Server tidak merespons. Silakan coba lagi.',
-          backgroundColor: Colors.red,
-        );
-        return;
-      }
-
-      // Tangani jika akun sudah ada
-      if (result.containsKey('error')) {
-        if (result['error'] == 'Pengguna sudah ada') {
-          if (result['is_verified'] == 0) {
-            // Akun sudah ada, tetapi belum diverifikasi
-            _showSnackbar(
-              context: context,
-              title: 'Info',
-              message:
-                  'Akun sudah terdaftar, tetapi belum diverifikasi. Silakan cek WhatsApp untuk kode OTP.',
-              backgroundColor: Colors.orange,
-            );
-            if (context.mounted) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Verify(phone: phone)),
-              );
-            }
-          } else {
-            // Akun sudah diverifikasi
-            _showSnackbar(
-              context: context,
-              title: 'Info',
-              message: 'Akun sudah terverifikasi. Silakan login.',
-              backgroundColor: Colors.blue,
-            );
-            if (context.mounted) {
-              Navigator.pushReplacementNamed(context, '/login');
-            }
-          }
-        } else {
-          // Kesalahan lainnya
-          _showSnackbar(
-            context: context,
-            title: 'Kesalahan',
-            message: 'Kesalahan: ${result['error']}',
-            backgroundColor: Colors.red,
-          );
-        }
-      } else {
-        // Registrasi berhasil
-        _showSnackbar(
-          context: context,
-          title: 'Sukses',
-          message: 'Registrasi berhasil! Anda bisa verifikasi OTP sekarang.',
-          backgroundColor: Colors.green,
-        );
-        if (context.mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Verify(phone: phone)),
-          );
-        }
-      }
-    } catch (e) {
-      // Tangani kesalahan
-      _showSnackbar(
-        context: context,
-        title: 'Kesalahan',
-        message:
-            'Data yang Anda masukkan tidak valid atau terjadi kesalahan: $e',
-        backgroundColor: Colors.red,
-      );
-    }
-  }
-
-  Future<void> verifyOtpForRegistration({
-    required String otp,
-    required String phone,
-    required BuildContext context,
-  }) async {
-    final data = {'otp': otp, 'phone': phone};
-
-    try {
-      // Mengirim request untuk verifikasi OTP
-      final result = await apiService.postRequest('/otp/verify', data);
-
-      // Menangani hasil dari API
-      if (result['error'] != null) {
-        _showSnackbar(
-          context: context,
-          title: 'Error',
-          message: 'Error: ${result['error']}',
-          backgroundColor: Colors.red,
-        );
-        return;
-      }
-
-      if (result['message'] == 'Account verified successfully') {
-        _showSnackbar(
-          context: context,
-          title: 'Sukses',
-          message: 'OTP berhasil diverifikasi! Anda bisa login sekarang.',
-          backgroundColor: Colors.green,
-        );
-        if (context.mounted) {
-          Navigator.pushReplacementNamed(context, '/login');
-        }
-      } else {
-        _showSnackbar(
-          context: context,
-          title: 'Error',
-          message: 'OTP tidak valid atau sudah kadaluarsa.',
-          backgroundColor: Colors.red,
-        );
-      }
-    } catch (e) {
-      // Menangani error jika terjadi masalah saat request
-      _showSnackbar(
+    _showSnackbar(
         context: context,
         title: 'Error',
-        message: 'Terjadi kesalahan: $e',
-        backgroundColor: Colors.red,
-      );
-    }
+        message: errorMessage,
+        backgroundColor: Colors.red);
   }
 
-  // Fungsi login
+  // Metode untuk menyimpan data pengguna di SharedPreferences
+  Future<void> _saveUserData(Map<String, dynamic> user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_email_or_phone',
+        user['email'] ?? user['phone']); // Menyimpan email atau phone
+  }
+
+  // Fungsi untuk login
   Future<void> login({
     required String emailOrPhone,
     required String password,
@@ -244,48 +72,48 @@ class AuthController {
     };
 
     try {
-      // Mengirim request login
       final result = await apiService.postRequest('/auth/login', data);
 
-      // Menangani hasil dari API
-      if (result.containsKey('error')) {
-        String errorMessage;
-
-        // Menentukan pesan error spesifik berdasarkan respons API
-        switch (result['error']) {
-          case 'Invalid credentials':
-            errorMessage = 'Email/No HP atau password Anda salah. Coba lagi!';
-            break;
-          case 'User not found':
-            errorMessage =
-                'Akun dengan email/No HP ini tidak ditemukan. Daftar terlebih dahulu!';
-            break;
-          case 'Account not verified':
-            errorMessage =
-                'Akun Anda belum diverifikasi. Silakan cek email atau WhatsApp untuk kode verifikasi.';
-            break;
-          default:
-            errorMessage = 'Terjadi kesalahan: ${result['error']}';
-        }
-
+      if (result == null) {
         _showSnackbar(
           context: context,
           title: 'Error',
-          message: errorMessage,
+          message: 'Terjadi kesalahan dalam respons API.',
           backgroundColor: Colors.red,
         );
-      } else {
-        // Login berhasil
+        return;
+      }
+
+      if (result.containsKey('error')) {
+        _handleLoginError(result, context);
+        return;
+      }
+
+      var user = result['user'];
+
+      if (user == null) {
         _showSnackbar(
           context: context,
-          title: 'Sukses',
-          message: 'Login berhasil!',
-          backgroundColor: Colors.green,
+          title: 'Error',
+          message: 'Data pengguna tidak ditemukan.',
+          backgroundColor: Colors.red,
         );
-        Navigator.pushReplacementNamed(context, '/home');
+        return;
       }
+
+      // Menyimpan data pengguna
+      await _saveUserData(user);
+
+      _showSnackbar(
+        context: context,
+        title: 'Sukses',
+        message: 'Login berhasil!',
+        backgroundColor: Colors.green,
+      );
+
+      // Pindah ke halaman home setelah login sukses
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      // Menangani error jika terjadi masalah saat request
       _showSnackbar(
         context: context,
         title: 'Error',
@@ -587,4 +415,12 @@ class AuthController {
       ),
     );
   }
+
+  register(
+      {required String name,
+      required String email,
+      required String phone,
+      required String password,
+      required String confirmPassword,
+      required BuildContext context}) {}
 }
