@@ -1,17 +1,30 @@
-# otp_login
+# EcoFood 🍽️
 
-A new Flutter project.
+Halo! 👋 Selamat datang di repo **EcoFood**, aplikasi keren yang menghubungkan pengguna dengan pengalaman belanja makanan yang lebih cerdas, ramah lingkungan, dan modern. Proyek ini dibuat sebagai bagian dari tugas mata kuliah **Mobile dan Webservice Praktik**. Yuk, simak lebih lanjut tentang aplikasi ini! 🚀
 
-## Getting Started
+## ✨ Tentang Aplikasi
+**EcoFood** adalah aplikasi belanja makanan berbasis Flutter yang dilengkapi dengan fitur-fitur canggih seperti:
 
-This project is a starting point for a Flutter application.
+- 📩 **Verifikasi OTP**: Menggunakan layanan **Fonnte** untuk pengiriman kode OTP.
+- 💳 **Payment Gateway**: Integrasi dengan **Midtrans** untuk pembayaran yang cepat dan aman.
+- 📱 **User Interface Modern**: Dibangun dengan **Flutter** untuk tampilan yang elegan dan interaktif.
 
-A few resources to get you started if this is your first Flutter project:
+### Back-End Service
+Aplikasi ini didukung oleh backend yang stabil dan andal. Kamu bisa cek repositori backend di sini:  
+[GitHub - EcoFood Backend](https://github.com/ariyoaziz/ecofood)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Desain UI/UX
+Desain aplikasi yang clean dan modern dirancang menggunakan **Figma**. Cek hasil desainnya di sini:  
+[Figma - EcoFood](https://www.figma.com/design/bYKGrLQYKZB4lxhbqcoXxm/Mobile-%26-Web-Service-P?node-id=0-1&t=w2T4QcJAVkYJiDg0-1)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# ecofood
+## 🛠️ Teknologi yang Digunakan
+- **Flutter**: Untuk pengembangan antarmuka pengguna.
+- **Fonnte**: Mengelola pengiriman OTP.
+- **Midtrans**: Payment gateway untuk pembayaran.
+- **Figma**: Desain UI/UX.
+
+
+
+---
+❤️ oleh Ariyo Aziz Pratama_5220411184
+
